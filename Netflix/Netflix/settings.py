@@ -100,12 +100,16 @@ def get_parameter(name, with_decryption=True):
     return response['Parameter']['Value']
 
 # --------- Fetch DB Secrets ----------
-DB_NAME = get_parameter("/netflix/DB_NAME")
-DB_USER = get_parameter("/netflix/DB_User")
-DB_PASSWORD = get_parameter("/netflix/DB_Password")  # SecureString → decrypted
-DB_HOST = get_parameter("/netflix/DB_Host")
-DB_PORT = get_parameter("/netflix/DB_Port")
-
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': get_parameter('/netflix/DB_NAME'),
+        'USER': get_parameter('/netflix/DB_User'),
+        'PASSWORD': get_parameter('/netflix/DB_Password'),
+        'HOST': get_parameter('/netflix/DB_Host'),
+        'PORT': get_parameter('/netflix/DB_Port', default='5432'),
+    }
+}
 
 
 # Password validation
