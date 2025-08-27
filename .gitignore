@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+.env
+
+# Local DB
+db.sqlite3
+
+# Media uploads (optional if user uploads are stored locally)
+/Netflix/media/
+
+# Static files (if collected during build)
+/Netflix/static/
+
+# IDE/editor
+.vscode/
+.idea/
