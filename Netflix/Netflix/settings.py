@@ -88,12 +88,24 @@ WSGI_APPLICATION = 'Netflix.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# Create SSM client
+ssm = boto3.client("ssm", region_name="ap-south-1")
+
+def get_parameter(name, with_decryption=True):
+    """Fetch a parameter value from AWS SSM Parameter Store"""
+    response = ssm.get_parameter(
+        Name=name,
+        WithDecryption=with_decryption
+    )
+    return response['Parameter']['Value']
+
+# --------- Fetch DB Secrets ----------
+DB_NAME = get_parameter("/netflix/DB_NAME")
+DB_USER = get_parameter("/netflix/DB_User")
+DB_PASSWORD = get_parameter("/netflix/DB_Password")  # SecureString → decrypted
+DB_HOST = get_parameter("/netflix/DB_Host")
+DB_PORT = get_parameter("/netflix/DB_Port")
+
 
 
 # Password validation
@@ -141,3 +153,18 @@ STATICFILES_DIRS=[STATIC_DIR]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+
+
+
+
+# --------- Fetch S3 Secrets ----------
+AWS_S3_BUCKET_NAME = get_parameter("/netflix/S3/BUCKET_NAME")
+AWS_S3_BUCKET_REGION = get_parameter("/netflix/S3/BUCKET_REGION")
+AWS_S3_ACCESS_KEY_ID = get_parameter("/netflix/S3/ACCESS_KEY_ID")
+AWS_S3_SECRET_ACCESS_KEY = get_parameter("/netflix/S3/SECRET_ACCESS_KEY")
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_S3_VERIFY = True
+
+
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
